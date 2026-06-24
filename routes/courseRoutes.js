@@ -9,7 +9,20 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const pool = getPool();
-    const result = await pool.request().query('SELECT * FROM Course');
+    const { search } = req.query;
+
+    let query = 'SELECT * FROM Course';
+
+    if (search) {
+      query += ` WHERE CourseName LIKE @search`;
+    }
+
+    const request = pool.request();
+    if (search) {
+      request.input('search', sql.VarChar, `%${search}%`);
+    }
+
+    const result = await request.query(query);
     res.json(result.recordset);
   } catch (err) {
     res.status(500).json({ error: err.message });

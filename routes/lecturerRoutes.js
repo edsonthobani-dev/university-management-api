@@ -10,7 +10,22 @@ const router = express.Router();  // Create a new router instance to define lect
 router.get('/', async (req, res) => {
   try {
     const pool = getPool();
-    const result = await pool.request().query('SELECT * FROM Lecturer');
+    const { search } = req.query;
+
+    let query = 'SELECT * FROM Lecturer';
+
+    if (search) {
+      query += ` WHERE FirstName LIKE @search 
+                 OR LastName LIKE @search 
+                 OR Email LIKE @search`;
+    }
+
+    const request = pool.request();
+    if (search) {
+      request.input('search', sql.VarChar, `%${search}%`);
+    }
+
+    const result = await request.query(query);
     res.json(result.recordset);
   } catch (err) {
     res.status(500).json({ error: err.message });
