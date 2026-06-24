@@ -1,8 +1,10 @@
-import express from 'express';
-import sql from '../db.js';
-import { getPool } from '../db.js';
+import express from 'express';  // Import express to create the server
+import sql from '../db.js';  // Import sql from db.js to interact with the database
+import { getPool } from '../db.js';  // Import getPool from db.js to get the database connection pool
+import { verifyToken, verifyRole } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+
+const router = express.Router();  // Create a new router instance to define enrollment-related routes
 
 // GET all enrollments
 router.get('/', async (req, res) => {
@@ -61,7 +63,7 @@ router.get('/course/:courseId', async (req, res) => {
 });
 
 // POST enroll a student
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, verifyRole('admin', 'lecturer'), async (req, res) => {
   const { StudentID, CourseID } = req.body;
   try {
     const pool = getPool();
@@ -79,7 +81,7 @@ router.post('/', async (req, res) => {
 });
 
 // DELETE unenroll a student
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   try {
     const pool = getPool();
     const result = await pool.request()

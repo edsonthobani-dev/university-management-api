@@ -1,6 +1,7 @@
 import express from 'express'; // Import express to create the server
 import sql from '../db.js';  // Import sql from db.js to interact with the database
 import { getPool } from '../db.js';  // Import getPool from db.js to get the database connection pool
+import { verifyToken, verifyRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();  // Create a new router instance to define lecturer-related routes
 
@@ -34,7 +35,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST a new lecturer
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, verifyRole('admin'), async (req, res) => {
   const { FirstName, LastName, Email, ContactNumber } = req.body;
   try {
     const pool = getPool();
@@ -55,7 +56,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT (update) a lecturer
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   const { FirstName, LastName, Email, ContactNumber } = req.body;
   try {
     const pool = getPool();
@@ -82,7 +83,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE a lecturer
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   try {
     const pool = getPool();
     const result = await pool.request()

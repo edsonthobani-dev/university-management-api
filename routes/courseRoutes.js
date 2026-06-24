@@ -1,9 +1,11 @@
 import express from 'express';
 import sql from '../db.js';
 import { getPool } from '../db.js';
+import { verifyToken, verifyRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// GET all - open to all
 router.get('/', async (req, res) => {
   try {
     const pool = getPool();
@@ -14,6 +16,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET single - open to all
 router.get('/:id', async (req, res) => {
   try {
     const pool = getPool();
@@ -30,7 +33,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+// POST - admin only
+router.post('/', verifyToken, verifyRole('admin'), async (req, res) => {
   const { CourseName, Credits, DurationYears } = req.body;
   try {
     const pool = getPool();
@@ -49,7 +53,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+// PUT - admin only
+router.put('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   const { CourseName, Credits, DurationYears } = req.body;
   try {
     const pool = getPool();
@@ -74,7 +79,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+// DELETE - admin only
+router.delete('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   try {
     const pool = getPool();
     const result = await pool.request()
