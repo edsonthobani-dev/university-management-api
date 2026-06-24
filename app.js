@@ -11,6 +11,7 @@ import courseRoutes from './routes/courseRoutes.js';  // Import course routes to
 import lecturerRoutes from './routes/lecturerRoutes.js'; // Import lecturer routes to handle lecturer-related API endpoints
 import enrollmentRoutes from './routes/enrollmentRoutes.js'; // Import enrollment routes to handle enrollment-related API endpoints
 import authRoutes from './routes/authRoutes.js'; // Import auth routes to handle authentication-related API endpoints
+import marksRoutes from './routes/marksRoutes.js';
 
 // Create an instance of the Express application
 const app = express();
@@ -19,6 +20,7 @@ const PORT = 5000;
 app.use(bodyParser.json());
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/marks', marksRoutes);
 
 // connect database
 connectDB();
