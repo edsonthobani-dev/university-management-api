@@ -12,6 +12,7 @@ import lecturerRoutes from './routes/lecturerRoutes.js'; // Import lecturer rout
 import enrollmentRoutes from './routes/enrollmentRoutes.js'; // Import enrollment routes to handle enrollment-related API endpoints
 import authRoutes from './routes/authRoutes.js'; // Import auth routes to handle authentication-related API endpoints
 import marksRoutes from './routes/marksRoutes.js';
+import { swaggerUi, specs } from './swagger.js';
 
 // Create an instance of the Express application
 const app = express();
@@ -21,6 +22,7 @@ app.use(bodyParser.json());
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/marks', marksRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // connect database
 connectDB();

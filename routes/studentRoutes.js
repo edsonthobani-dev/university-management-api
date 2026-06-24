@@ -8,6 +8,23 @@ import { verifyToken, verifyRole } from '../middleware/authMiddleware.js'; // Im
 
 const router = express.Router(); // Create a new router instance to define student-related routes
 // GET all students
+/**
+ * @swagger
+ * /api/students:
+ *   get:
+ *     summary: Get all students
+ *     tags: [Students]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by name, email or student number
+ *     responses:
+ *       200:
+ *         description: List of students
+ */
+
 router.get('/', async (req, res) => {
   try {
     const pool = getPool();
@@ -35,6 +52,24 @@ router.get('/', async (req, res) => {
 });
 
 // GET a specific student by ID
+/**
+ * @swagger
+ * /api/students/{id}:
+ *   get:
+ *     summary: Get student by ID
+ *     tags: [Students]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Student found
+ *       404:
+ *         description: Student not found
+ */
 router.get('/:id', async (req, res) => {
   try {
     const pool = getPool();
@@ -52,6 +87,37 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST a new student
+/**
+ * @swagger
+ * /api/students:
+ *   post:
+ *     summary: Create a new student
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               StudentNumber:
+ *                 type: string
+ *               FirstName:
+ *                 type: string
+ *               LastName:
+ *                 type: string
+ *               Email:
+ *                 type: string
+ *               ContactNumber:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Student created successfully
+ *       400:
+ *         description: Validation error
+ */
 router.post('/', verifyToken, verifyRole('admin'),
   [
     body('StudentNumber').notEmpty().withMessage('Student number is required'),
@@ -84,6 +150,41 @@ router.post('/', verifyToken, verifyRole('admin'),
 );
 
 // PUT (update) a student
+/**
+ * @swagger
+ * /api/students/{id}:
+ *   put:
+ *     summary: Update a student
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               FirstName:
+ *                 type: string
+ *               LastName:
+ *                 type: string
+ *               Email:
+ *                 type: string
+ *               ContactNumber:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Student updated successfully
+ *       400:
+ *         description: Validation error
+ */
 router.put('/:id', verifyToken, verifyRole('admin'),
   [
     body('FirstName').notEmpty().withMessage('First name is required'),
@@ -120,6 +221,26 @@ router.put('/:id', verifyToken, verifyRole('admin'),
 );
 
 // DELETE a student
+/**
+ * @swagger
+ * /api/students/{id}:
+ *   delete:
+ *     summary: Delete a student
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Student deleted successfully
+ *       404:
+ *         description: Student not found
+ */
 router.delete('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   try {
     const pool = getPool();
