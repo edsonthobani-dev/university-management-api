@@ -1,8 +1,10 @@
-import express from 'express';
-import sql from '../db.js';
-import { getPool } from '../db.js';
+import express from 'express'; // Import express to create the server
+import sql from '../db.js';  // Import sql from db.js to interact with the database
+import { getPool } from '../db.js';  // Import getPool from db.js to get the database connection pool
 
-const router = express.Router();
+const router = express.Router();  // Create a new router instance to define lecturer-related routes
+
+// GET all lecturers
 
 router.get('/', async (req, res) => {
   try {
@@ -14,6 +16,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET a specific lecturer by ID
 router.get('/:id', async (req, res) => {
   try {
     const pool = getPool();
@@ -30,6 +33,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// POST a new lecturer
 router.post('/', async (req, res) => {
   const { FirstName, LastName, Email, ContactNumber } = req.body;
   try {
@@ -50,6 +54,7 @@ router.post('/', async (req, res) => {
   }
 });
 
+// PUT (update) a lecturer
 router.put('/:id', async (req, res) => {
   const { FirstName, LastName, Email, ContactNumber } = req.body;
   try {
@@ -76,6 +81,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE a lecturer
 router.delete('/:id', async (req, res) => {
   try {
     const pool = getPool();

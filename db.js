@@ -14,12 +14,13 @@ const config = {
 
 let pool;
 
+//connect database to access tables and data in sql server 
 export const connectDB = async () => {
   try {
     pool = await sql.connect(config);
-    console.log('Connected to SQL Server ✔');
+    console.log('Connected to SQL Server');
   } catch (err) {
-    console.log('Database connection failed ❌', err);
+    console.log('Database connection failed', err);
   }
 };
 

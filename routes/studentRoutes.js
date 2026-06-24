@@ -1,9 +1,11 @@
-import express from 'express';
-import sql from '../db.js';
-import { getPool } from '../db.js';
+import express from 'express'; // Import express to create the server
+import sql from '../db.js'; // Import sql from db.js to interact with the database
+import { getPool } from '../db.js'; // Import getPool from db.js to get the database connection pool
+import { verifyToken, verifyRole } from '../middleware/authMiddleware.js'; // Import authentication middleware to protect routes and verify user roles
 
-const router = express.Router();
 
+const router = express.Router(); // Create a new router instance to define student-related routes
+// GET all students
 router.get('/', async (req, res) => {
   try {
     const pool = getPool();
@@ -14,6 +16,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET a specific student by ID
 router.get('/:id', async (req, res) => {
   try {
     const pool = getPool();
@@ -30,7 +33,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+// POST a new student
+router.post('/', verifyToken, verifyRole('admin'), async (req, res) => {
   const { StudentNumber, FirstName, LastName, Email, ContactNumber } = req.body;
   try {
     const pool = getPool();
@@ -51,7 +55,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+// PUT (update) a student
+router.put('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   const { FirstName, LastName, Email, ContactNumber } = req.body;
   try {
     const pool = getPool();
@@ -77,7 +82,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+// DELETE a student
+router.delete('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
   try {
     const pool = getPool();
     const result = await pool.request()
