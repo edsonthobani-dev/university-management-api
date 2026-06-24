@@ -1,3 +1,5 @@
+import { body } from 'express-validator';
+import { validate } from '../middleware/validate.js';
 import express from 'express'; // Import express to create the server
 import sql from '../db.js'; // Import sql from db.js to interact with the database
 import { getPool } from '../db.js'; // Import getPool from db.js to get the database connection pool
@@ -34,53 +36,72 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST a new student
-router.post('/', verifyToken, verifyRole('admin'), async (req, res) => {
-  const { StudentNumber, FirstName, LastName, Email, ContactNumber } = req.body;
-  try {
-    const pool = getPool();
-    await pool.request()
-      .input('StudentNumber', sql.Char, StudentNumber)
-      .input('FirstName', sql.VarChar, FirstName)
-      .input('LastName', sql.VarChar, LastName)
-      .input('Email', sql.VarChar, Email)
-      .input('ContactNumber', sql.VarChar, ContactNumber)
-      .query(`
-        INSERT INTO Student (StudentNumber, FirstName, LastName, Email, ContactNumber)
-        VALUES (@StudentNumber, @FirstName, @LastName, @Email, @ContactNumber)
-      `);
+router.post('/', verifyToken, verifyRole('admin'),
+  [
+    body('StudentNumber').notEmpty().withMessage('Student number is required'),
+    body('FirstName').notEmpty().withMessage('First name is required'),
+    body('LastName').notEmpty().withMessage('Last name is required'),
+    body('Email').isEmail().withMessage('Valid email is required'),
+    body('ContactNumber').notEmpty().withMessage('Contact number is required')
+  ],
+  validate,
+  async (req, res) => {
+    const { StudentNumber, FirstName, LastName, Email, ContactNumber } = req.body;
+    try {
+      const pool = getPool();
+      await pool.request()
+        .input('StudentNumber', sql.Char, StudentNumber)
+        .input('FirstName', sql.VarChar, FirstName)
+        .input('LastName', sql.VarChar, LastName)
+        .input('Email', sql.VarChar, Email)
+        .input('ContactNumber', sql.VarChar, ContactNumber)
+        .query(`
+          INSERT INTO Student (StudentNumber, FirstName, LastName, Email, ContactNumber)
+          VALUES (@StudentNumber, @FirstName, @LastName, @Email, @ContactNumber)
+        `);
 
-    res.status(201).json({ message: 'Student created successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      res.status(201).json({ message: 'Student created successfully' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 // PUT (update) a student
-router.put('/:id', verifyToken, verifyRole('admin'), async (req, res) => {
-  const { FirstName, LastName, Email, ContactNumber } = req.body;
-  try {
-    const pool = getPool();
-    const result = await pool.request()
-      .input('id', sql.Int, req.params.id)
-      .input('FirstName', sql.VarChar, FirstName)
-      .input('LastName', sql.VarChar, LastName)
-      .input('Email', sql.VarChar, Email)
-      .input('ContactNumber', sql.VarChar, ContactNumber)
-      .query(`
-        UPDATE Student
-        SET FirstName = @FirstName, LastName = @LastName,
-            Email = @Email, ContactNumber = @ContactNumber
-        WHERE StudentID = @id
-      `);
+router.put('/:id', verifyToken, verifyRole('admin'),
+  [
+    body('FirstName').notEmpty().withMessage('First name is required'),
+    body('LastName').notEmpty().withMessage('Last name is required'),
+    body('Email').isEmail().withMessage('Valid email is required'),
+    body('ContactNumber').notEmpty().withMessage('Contact number is required')
+  ],
+  validate,
+  async (req, res) => {
+    const { FirstName, LastName, Email, ContactNumber } = req.body;
+    try {
+      const pool = getPool();
+      const result = await pool.request()
+        .input('id', sql.Int, req.params.id)
+        .input('FirstName', sql.VarChar, FirstName)
+        .input('LastName', sql.VarChar, LastName)
+        .input('Email', sql.VarChar, Email)
+        .input('ContactNumber', sql.VarChar, ContactNumber)
+        .query(`
+          UPDATE Student
+          SET FirstName = @FirstName, LastName = @LastName,
+              Email = @Email, ContactNumber = @ContactNumber
+          WHERE StudentID = @id
+        `);
 
-    if (result.rowsAffected[0] === 0)
-      return res.status(404).json({ message: 'Student not found' });
+      if (result.rowsAffected[0] === 0)
+        return res.status(404).json({ message: 'Student not found' });
 
-    res.json({ message: 'Student updated successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      res.json({ message: 'Student updated successfully' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 // DELETE a student
 router.delete('/:id', verifyToken, verifyRole('admin'), async (req, res) => {

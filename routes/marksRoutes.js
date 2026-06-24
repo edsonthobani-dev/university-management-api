@@ -2,6 +2,8 @@ import express from 'express';
 import sql from '../db.js';
 import { getPool } from '../db.js';
 import { verifyToken, verifyRole } from '../middleware/authMiddleware.js';
+import { body } from 'express-validator';
+import { validate } from '../middleware/validate.js';
 
 const router = express.Router();
 
@@ -14,8 +16,10 @@ router.get('/', verifyToken, verifyRole('admin'), async (req, res) => {
              s.FirstName + ' ' + s.LastName AS StudentName,
              c.CourseName
       FROM Mark m
-      JOIN Student s ON m.StudentID = s.StudentID
-      JOIN Course c ON m.CourseID = c.CourseID
+      JOIN Student s 
+      ON m.StudentID = s.StudentID
+      JOIN Course c 
+      ON m.CourseID = c.CourseID
     `);
     res.json(result.recordset);
   } catch (err) {
@@ -53,7 +57,8 @@ router.get('/course/:courseId', verifyToken, verifyRole('admin', 'lecturer'), as
         SELECT m.MarkID, m.Mark, m.Grade, m.DateRecorded,
                s.FirstName + ' ' + s.LastName AS StudentName
         FROM Mark m
-        JOIN Student s ON m.StudentID = s.StudentID
+        JOIN Student s 
+        ON m.StudentID = s.StudentID
         WHERE m.CourseID = @courseId
       `);
     res.json(result.recordset);
@@ -63,7 +68,14 @@ router.get('/course/:courseId', verifyToken, verifyRole('admin', 'lecturer'), as
 });
 
 // POST add mark - lecturer and admin only
-router.post('/', verifyToken, verifyRole('admin', 'lecturer'), async (req, res) => {
+router.post('/', verifyToken, verifyRole('admin', 'lecturer'),
+  [
+    body('StudentID').isInt().withMessage('Valid StudentID is required'),
+    body('CourseID').isInt().withMessage('Valid CourseID is required'),
+    body('Mark').isFloat({ min: 0, max: 100 }).withMessage('Mark must be between 0 and 100')
+  ],
+  validate,
+  async (req, res) => {
   const { StudentID, CourseID, Mark } = req.body;
 
   // calculate grade
