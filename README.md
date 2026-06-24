@@ -1,3 +1,4 @@
+#ET Mtshiliba 0680699772 @edsonthobani@gmail.com
 # Ndabane University Management API
 
 A full-featured REST API built with Node.js, Express, and Microsoft SQL Server for managing university students, courses, lecturers, enrollments and marks.
