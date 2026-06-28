@@ -1,5 +1,9 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const swaggerUiDist = require('swagger-ui-dist');
 
 const options = {
   definition: {
@@ -10,11 +14,11 @@ const options = {
       description: 'A REST API for managing university students, courses, lecturers, enrollments and marks',
     },
     servers: [
-      {
-        url: 'http://localhost:5000',
-        description: 'Development server',
-      },
-    ],
+  {
+    url: 'http://localhost:3000',
+    description: 'Development server',
+  },
+],
     components: {
       securitySchemes: {
         bearerAuth: {

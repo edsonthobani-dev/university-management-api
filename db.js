@@ -5,7 +5,7 @@ const config = {
   port: 1433,
   database: 'dbNdabaneUniversity',
   user: 'ndabane_user',
-  password: 'Edisonthobani0612#!',
+  password: 'Admin123!',
   options: {
     encrypt: false,
     trustServerCertificate: true

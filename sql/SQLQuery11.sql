@@ -9,7 +9,7 @@ CREATE TABLE Users (
 
 USE dbNdabaneUniversity;
 
-CREATE TABLE Marks (
+CREATE TABLE Mark (
   MarkID INT PRIMARY KEY IDENTITY(1,1),
   StudentID INT NOT NULL,
   CourseID INT NOT NULL,
